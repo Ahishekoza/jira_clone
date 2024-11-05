@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { db } from "@/lib/prisma";
 import { auth, clerkClient } from "@clerk/nextjs/server";
@@ -50,4 +50,36 @@ export const getOrganization = async (slug) => {
   }
 
   return organization;
+};
+
+export const getMembersListInTheOrganization = async () => {
+  const { userId, orgId } = auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const { data: MemebersList } =
+    await clerkClient().organizations.getOrganizationMembershipList({
+      organizationId: orgId,
+    });
+
+  const memberIds = MemebersList.map((member) => member.publicUserData.userId);
+
+  const users = await db.user.findMany({
+    where: {
+      clerkUserId: {
+        in: memberIds,
+      },
+    },
+  });
+
+  return users;
 };

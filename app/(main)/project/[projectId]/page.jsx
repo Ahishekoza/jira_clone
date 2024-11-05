@@ -2,6 +2,7 @@ import { getSingleProject } from "@/actions/projects";
 import { notFound } from "next/navigation";
 import React from "react";
 import SprintCreationForm from "../components/create-sprint";
+import SprintBoard from "../components/sprint-board";
 
 const SingleProject = async ({ params }) => {
   const { projectId } = params;
@@ -21,7 +22,11 @@ const SingleProject = async ({ params }) => {
       {/* Sprint Display Dashboard */}
       {project?.sprints.length > 0 ? (
         <>
-          <p>Projects created</p>
+          <SprintBoard
+            sprints={project?.sprints}
+            projectId={projectId}
+            orgId={project.organizationId}
+          />
         </>
       ) : (
         <>
