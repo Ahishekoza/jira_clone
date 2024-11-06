@@ -75,6 +75,7 @@ const CreateIssueDrawer = ({
   useEffect(() => {
     if (issue) {
       reset(), onClose();
+      handleIssueCreation();
       toast.success("Successfully created Issue");
     }
   }, [issue]);
@@ -161,14 +162,14 @@ const CreateIssueDrawer = ({
             </div>
             <div>
               <label
-                htmlFor="prority"
+                htmlFor="priority"
                 className="block text-sm font-medium mb-1"
               >
-                Prority
+                Priority
               </label>
               <Controller
                 control={control}
-                name="prority"
+                name="priority"
                 render={({ field }) => (
                   <Select
                     onValueChange={field.onChange}

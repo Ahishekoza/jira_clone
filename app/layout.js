@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           <ThemeProvider attribute="class" defaultTheme="dark">
             {/* header */}
             <Header />
-            <main className="min-h-screen px-5 ">{children}</main>
+            <main className="min-h-screen px-5 mb-10 ">{children}</main>
             <Toaster richColors />
             <footer className="bg-gray-900 py-12 ">
               <p className="text-center">Made with ❤️ by Abhishek</p>

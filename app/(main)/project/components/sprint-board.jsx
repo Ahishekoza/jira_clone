@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import CreateIssueDrawer from "./create-issue";
 import { useFetch } from "@/hooks/use-fetch";
-import { getIssuesForSprint } from "@/actions/issues";
+import { getIssuesForSprint, updateIssuesOrder } from "@/actions/issues";
 import IssueCard from "./issue-card";
 import { BarLoader } from "react-spinners";
 import { toast } from "sonner";
@@ -35,6 +35,13 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     data: issues,
     setData: setIssues,
   } = useFetch(getIssuesForSprint);
+
+  const {
+    data: updatedIssue,
+    loading: updateIssueLoading,
+    error: updateIssueError,
+    fn: updateIssuesOrderFn,
+  } = useFetch(updateIssuesOrder);
 
   /**
    * Fetching the issues for the specified sprint
@@ -101,11 +108,11 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
         card.order = i;
       });
     } else {
-      const [movedCard] = sourceList.splice(sourceList.index,1)
+      const [movedCard] = sourceList.splice(source.index, 1);
 
-      movedCard.status = destination.droppableId
+      movedCard.status = destination.droppableId;
 
-      destinationList.splice(destination.index,0,movedCard)
+      destinationList.splice(destination.index, 0, movedCard);
 
       sourceList.forEach((card, i) => {
         card.order = i;
@@ -120,10 +127,10 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     setIssues(sortedOrderCard);
 
     console.log(sortedOrderCard);
-    console.log(source,destination);
-
+    console.log(source, destination);
 
     // --- api Call for order updation
+    updateIssuesOrderFn(sortedOrderCard);
   };
 
   const handleAddIssue = (status) => {
@@ -131,7 +138,18 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     setIsDrawerOpen(true);
   };
 
-  const handleIssueCreation = (data) => {};
+  const handleIssueCreation = () => {
+    fetchIssues(currentActiveSprint?.id);
+  };
+
+  const handleIssueUpdate = (updatedIssue) => {
+    setIssues((issues) => {
+      return issues.map((issue) => {
+        if (issue.id === updatedIssue.id) return updatedIssue;
+        return issue;
+      });
+    });
+  };
 
   return (
     <div>
@@ -142,7 +160,18 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
         sprints={sprints}
         projectId={projectId}
       />
+
+      {issuesError && (
+        <p className="text-red-500 mt-2">{issuesError.message}</p>
+      )}
+      {updateIssueError && (
+        <p className="text-red-500 mt-2">{updateIssueError.message}</p>
+      )}
       {issuesLoading && (
+        <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
+      )}
+
+      {updateIssueLoading && (
         <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
       )}
 
@@ -169,6 +198,7 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                           key={issue.id}
                           index={index}
                           draggableId={issue.id}
+                          isDragDisabled={updateIssueLoading}
                         >
                           {(provided) => {
                             return (
@@ -177,7 +207,13 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                               >
-                                <IssueCard issue={issue} />
+                                <IssueCard
+                                  issue={issue}
+                                  onDelete={() =>
+                                    fetchIssues(currentActiveSprint?.id)
+                                  }
+                                  onUpdate={handleIssueUpdate}
+                                />
                               </div>
                             );
                           }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { OrganizationSwitcher, SignedIn } from "@clerk/nextjs";
+import { OrganizationSwitcher, SignedIn, useOrganization, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import React from "react";
 

@@ -12,6 +12,7 @@ import { useFetch } from "@/hooks/use-fetch";
 import { createProject } from "@/actions/projects";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import OrgSwitcher from "@/components/org-switcher";
 
 const CreateProject = () => {
   const { isLoaded: isOrgLoaded, membership } = useOrganization();
@@ -62,7 +63,7 @@ const CreateProject = () => {
         <span className="text-2xl gradient-title">
           Oops! Only Admins can create projects.
         </span>
-        <OrganizationSwitcher hidePersonal />
+        <OrgSwitcher />
       </div>
     );
   }
